@@ -21,26 +21,29 @@ import org.springframework.cache.ehcache.EhCacheFactoryBean
 import spock.lang.Unroll
 import net.sf.ehcache.*
 import net.sf.ehcache.constructs.blocking.*
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import static net.sf.ehcache.Status.STATUS_UNINITIALISED
+import net.sf.ehcache.config.CacheConfiguration
 
-class SpringcacheServiceSpec extends UnitSpec {
+@TestFor(SpringcacheService)
+class SpringcacheServiceSpec extends Specification {
 
 	CacheManager manager = new CacheManager()
 	Ehcache cache1, cache2
-	SpringcacheService service
 
-	def setup() {
+	void setup() {
 		manager.addCache "cache1"
 		manager.addCache "cache2"
 
 		cache1 = manager.getEhcache("cache1")
 		cache2 = manager.getEhcache("cache2")
 
-		mockLogging SpringcacheService, true
-		service = new SpringcacheService(springcacheCacheManager: manager)
+		service.springcacheCacheManager = manager
 	}
 
-	@Unroll("calling flush(#flushArgument) flushes the correct cache or caches")
-	def "calling flush flushes the correct cache or caches"() {
+	@Unroll({"calling flush($flushArgument) flushes the correct cache or caches"})
+	void "calling flush flushes the correct cache or caches"() {
 		given:
 		cache1.put(new Element("key", "value"))
 		cache2.put(new Element("key", "value"))
@@ -60,13 +63,15 @@ class SpringcacheServiceSpec extends UnitSpec {
 		"cacheX"             | 1          | 1
 	}
 
-	def "exceptions on flush are handled"() {
+	void "exceptions on flush are handled"() {
 		given:
 		cache1.put(new Element("key", "value"))
 
 		and:
 		def cache3 = Mock(Ehcache)
 		cache3.name >> "cache3"
+		cache3.status >> STATUS_UNINITIALISED
+		cache3.cacheConfiguration >> new CacheConfiguration(name: 'cache3')
 		cache3.flush() >> { new IllegalStateException("this exception would be thrown if cache is not in $Status.STATUS_ALIVE") }
 		manager.addCache cache3
 
@@ -77,7 +82,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		cache1.size == 0
 	}
 
-	def "flush all flushes everything"() {
+	void "flush all flushes everything"() {
 		given:
 		cache1.put(new Element("key", "value"))
 		cache2.put(new Element("key", "value"))
@@ -90,13 +95,15 @@ class SpringcacheServiceSpec extends UnitSpec {
 		cache2.size == 0
 	}
 
-	def clearStatistics() {
+	void clearStatistics() {
 		given:
-		[cache1, cache2].each { cache ->
+		for (cache in [cache1, cache2]) {
 			cache.get("key") // triggers a miss
 			cache.put(new Element("key", "value"))
 			cache.get("key") // triggers a hit
 		}
+		println cache1.statistics
+		println cache2.statistics
 
 		when:
 		service.clearStatistics()
@@ -114,8 +121,8 @@ class SpringcacheServiceSpec extends UnitSpec {
 		cache2.statistics.cacheMisses == 0L
 	}
 
-	@Unroll("doWithCache retrieves #value from cache")
-	def "doWithCache retrieves value from cache"() {
+	@Unroll({"doWithCache retrieves $value from cache"})
+	void "doWithCache retrieves value from cache"() {
 		given:
 		cache1.put(new Element("key", value))
 
@@ -131,7 +138,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		value << ["value", null]
 	}
 
-	def "doWithCache stores value returned by closure if not found in cache"() {
+	void "doWithCache stores value returned by closure if not found in cache"() {
 		when:
 		def result = service.doWithCache("cache1", "key") {
 			return "value"
@@ -144,7 +151,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		cache1.get("key").objectValue == "value"
 	}
 
-	def "doWithCache stores value returned by closure if cache element expired"() {
+	void "doWithCache stores value returned by closure if cache element expired"() {
 		given:
 		def element = new Element("key", "value")
 		element.timeToLive = 1
@@ -166,7 +173,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		!cache1.get("key").expired
 	}
 
-	def "doWithCache stores null if closure returns null"() {
+	void "doWithCache stores null if closure returns null"() {
 		when:
 		def result = service.doWithCache("cache1", "key") {
 			return null
@@ -180,7 +187,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		cache1.get("key").objectValue == null
 	}
 
-	def "doWithCache throws exception if cache not found and autoCreateCaches is false"() {
+	void "doWithCache throws exception if cache not found and autoCreateCaches is false"() {
 		given:
 		service.autoCreateCaches = false
 
@@ -193,7 +200,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		thrown NoSuchCacheException
 	}
 
-	def "doWithCache creates a new cache if cache not found and autoCreateCaches is true"() {
+	void "doWithCache creates a new cache if cache not found and autoCreateCaches is true"() {
 		given:
 		def beanBuilder = new BeanBuilder()
 		beanBuilder.beans {
@@ -215,7 +222,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		manager.getEhcache("cacheA").get("key").objectValue == "value"
 	}
 
-	def "doWithBlockingCache does not decorate cache if it is a blocking cache already"() {
+	void "doWithBlockingCache does not decorate cache if it is a blocking cache already"() {
 		given:
 		def blockingCache = new BlockingCache(new Cache("blockingCache", 1, false, false, 1, 0))
 		manager.addCache(blockingCache)
@@ -230,7 +237,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		blockingCache.get("key").objectValue == "value"
 	}
 
-	def "doWithBlockingCache decorates cache before using if it is non-blocking"() {
+	void "doWithBlockingCache decorates cache before using if it is non-blocking"() {
 		given:
 		manager.addCache("nonBlockingCache")
 
@@ -244,7 +251,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		manager.getEhcache("nonBlockingCache").get("key").objectValue == "value"
 	}
 
-	def "doWithBlockingCache clears lock if exception is thrown from closure"() {
+	void "doWithBlockingCache clears lock if exception is thrown from closure"() {
 		given:
 		def blockingCache = new BlockingCache(new Cache("blockingCache", 1, false, false, 1, 0))
 		blockingCache.timeoutMillis = 10
@@ -263,11 +270,13 @@ class SpringcacheServiceSpec extends UnitSpec {
 		blockingCache.get("key") == null
 	}
 
-	def "doWithBlockingCache does not try to clear lock if it never acquires it"() {
+	void "doWithBlockingCache does not try to clear lock if it never acquires it"() {
 		given:
 		def blockingCache = Mock(BlockingCache)
 		// simulate lock held on cache by another thread
 		blockingCache.name >> "blockingCache"
+		blockingCache.status >> STATUS_UNINITIALISED
+		blockingCache.cacheConfiguration >> new CacheConfiguration(name: 'cache3')
 		blockingCache.get("key") >> { throw new LockTimeoutException() }
 		manager.addCache(blockingCache)
 
@@ -280,7 +289,7 @@ class SpringcacheServiceSpec extends UnitSpec {
 		thrown LockTimeoutException
 	}
 
-	def "doWithCache delegates to doWithBlockingCache if it finds a blocking cache"() {
+	void "doWithCache delegates to doWithBlockingCache if it finds a blocking cache"() {
 		given:
 		def blockingCache = new BlockingCache(new Cache("blockingCache", 1, false, false, 1, 0))
 		blockingCache.timeoutMillis = 10
@@ -299,10 +308,10 @@ class SpringcacheServiceSpec extends UnitSpec {
 		blockingCache.get("key") == null
 	}
 
-	@Unroll("the #methodName method passes through when the plugin is disabled")
-	def "caching methods pass through when the plugin is disabled"() {
+	@Unroll({"the $methodName method passes through when the plugin is disabled"})
+	void "caching methods pass through when the plugin is disabled"() {
 		given:
-		mockConfig "springcache.enabled = false"
+		grailsApplication.config.springcache.enabled = false
 		service.springcacheCacheManager = null
 
 		when:
@@ -320,10 +329,10 @@ class SpringcacheServiceSpec extends UnitSpec {
 		methodName << ["doWithCache", "doWithBlockingCache"]
 	}
 
-	@Unroll("the #methodName method is a no-op when the plugin is disabled")
-	def "flush and clear methods are no-ops when the plugin is disabled"() {
+	@Unroll({"the $methodName method is a no-op when the plugin is disabled"})
+	void "flush and clear methods are no-ops when the plugin is disabled"() {
 		given:
-		mockConfig "springcache.enabled = false"
+		grailsApplication.config.springcache.enabled = false
 		service.springcacheCacheManager = null
 
 		when:

@@ -25,7 +25,7 @@ class AspectSmokeTests extends GroovyTestCase {
 	def cachingService // prototype scope, unique per test
 	
 	void setUp() {
-		assert cachingService.value == 0
+		cachingService.value = 0
 	}
 
 	void tearDown() {
