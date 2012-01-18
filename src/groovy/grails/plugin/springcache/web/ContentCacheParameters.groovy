@@ -15,8 +15,8 @@
  */
 package grails.plugin.springcache.web
 
-import java.lang.reflect.Field
 import javax.servlet.http.HttpServletRequest
+import java.lang.reflect.*
 import org.codehaus.groovy.grails.commons.*
 import org.codehaus.groovy.grails.web.servlet.mvc.*
 
@@ -24,7 +24,7 @@ class ContentCacheParameters {
 
 	private final GrailsWebRequest grailsWebRequest
 	@Lazy GrailsControllerClass controller = initController()
-	@Lazy Field action = initAction()
+	@Lazy Member action = initAction()
 
 	ContentCacheParameters(GrailsWebRequest grailsWebRequest) {
 		this.grailsWebRequest = grailsWebRequest
@@ -51,15 +51,22 @@ class ContentCacheParameters {
 	}
 
 	private GrailsControllerClass initController() {
-		ApplicationHolder.application.getArtefactByLogicalPropertyName("Controller", controllerName)
+		ApplicationHolder.application.getArtefactByLogicalPropertyName('Controller', controllerName)
 	}
 
-	private Field initAction() {
-		try {
-			controller?.clazz?.getDeclaredField(getActionName())
-		} catch (NoSuchFieldException e) {
-			// this can happen with dynamic scaffolded actions
-			null
+	private Member initAction() {
+		findMethodAction() ?: findClosureAction()
+	}
+
+	private Method findMethodAction() {
+		controller?.clazz?.declaredMethods?.find {
+			it.name == actionName && Modifier.isPublic(it.modifiers) && it.returnType == Object
+		}
+	}
+
+	private Field findClosureAction() {
+		controller?.clazz?.declaredFields?.find {
+			it.name == actionName && it.type in [Object, Closure]
 		}
 	}
 
