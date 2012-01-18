@@ -26,13 +26,13 @@ class HeadersCategorySpec extends UnitSpec {
 
 	HttpDateFormatter formatter = new HttpDateFormatter()
 
-	def setup() {
+	void setup() {
 		registerMetaClass PageInfo
 		PageInfo.metaClass.mixin(HeadersCategory)
 	}
 
 	@Unroll
-	def "can use headers to identify newer content"() {
+	void "can use headers to identify newer content"() {
 		given:
 		def headers = []
 		if (lastModified) headers << ([LAST_MODIFIED, lastModified] as String[])
@@ -55,7 +55,7 @@ class HeadersCategorySpec extends UnitSpec {
 	}
 
 	@Unroll
-	def "can use headers to identify matching content"() {
+	void "can use headers to identify matching content"() {
 		given:
 		def headers = []
 		if (eTag) headers << ([ETAG, eTag] as String[])
@@ -78,7 +78,7 @@ class HeadersCategorySpec extends UnitSpec {
 	}
 
 	@Unroll
-	def "can decode cache control directives"() {
+	void "can decode cache control directives"() {
 		given:
 		def headers = []
 		if (cacheControl) headers << ([CACHE_CONTROL, cacheControl] as String[])

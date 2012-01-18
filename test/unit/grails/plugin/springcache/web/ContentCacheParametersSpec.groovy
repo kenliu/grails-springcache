@@ -23,7 +23,7 @@ import org.codehaus.groovy.grails.commons.*
 
 class ContentCacheParametersSpec extends UnitSpec {
 
-	def setup() {
+	void setup() {
 		// set up the controllers as artefacts
 		def application = Mock(GrailsApplication)
 		[TestController].each { controllerClass ->
@@ -35,7 +35,7 @@ class ContentCacheParametersSpec extends UnitSpec {
 	}
 
 	@Unroll({"controller is $expectedController and action is $expectedActionName when controllerName is '$controllerName' and actionName is '$actionName'"})
-	def "controller and action are identified based on the request context"() {
+	void "controller and action are identified based on the request context"() {
 		given:
 		def webRequest = Mock(GrailsWebRequest)
 		webRequest.controllerName >> controllerName

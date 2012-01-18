@@ -33,7 +33,7 @@ class FilterContextSpec extends Specification {
 	GrailsWebRequest request = Mock()
 	MockApplicationContext appCtx = new MockApplicationContext()
 
-	def setup() {
+	void setup() {
 		// set up a spring context with a cacheResolver
 		ApplicationContext.metaClass.propertyMissing = { name -> delegate.getBean(name) }
 		appCtx.registerMockBean("springcacheDefaultCacheResolver", new DefaultCacheResolver())
@@ -53,7 +53,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"shouldCache returns $shouldCache when controller is '$controllerName' and action is '$actionName'"})
-	def "a request is considered cachable if there is an annotation on the controller or action"() {
+	void "a request is considered cachable if there is an annotation on the controller or action"() {
 		given: "there is a request context"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -75,7 +75,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"shouldFlush returns $shouldFlush when controller is '$controllerName' and action is '$actionName'"})
-	def "a request is considered flushable if there is an annotation on the controller or action"() {
+	void "a request is considered flushable if there is an annotation on the controller or action"() {
 		given: "there is a request context"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -95,7 +95,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"cache name is '$expectedCacheName' when controller is '$controllerName' and action is '$actionName'"})
-	def "the cache name is identified based on the annotation on the controller or action"() {
+	void "the cache name is identified based on the annotation on the controller or action"() {
 		given: "there is a request context"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -115,7 +115,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"cannot get cache name when controller is '$controllerName' and action is '$actionName'"})
-	def "cannot get cache name for a non-caching request"() {
+	void "cannot get cache name for a non-caching request"() {
 		given: "a request for a non-caching action"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -138,7 +138,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"cache names are $expectedCacheNames when controller is '$controllerName' and action is '$actionName'"})
-	def "the cache names are identified based on the annotation on the controller or action"() {
+	void "the cache names are identified based on the annotation on the controller or action"() {
 		given: "there is a request context"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -156,7 +156,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"cannot get cache names when controller is '$controllerName' and action is '$actionName'"})
-	def "cannot get cache names for a non-flushing request"() {
+	void "cannot get cache names for a non-flushing request"() {
 		given: "a request for a non-flushing action"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -178,7 +178,7 @@ class FilterContextSpec extends Specification {
 		"cachedTest"   | "list1"
 	}
 
-	def "the cache name is identified via the cache resolver specified by the annotation"() {
+	void "the cache name is identified via the cache resolver specified by the annotation"() {
 		given: "a cache resolver bean"
 		def mockCacheResolver = Mock(CacheResolver)
 		appCtx.registerMockBean("mockCacheResolver", mockCacheResolver)
@@ -194,7 +194,7 @@ class FilterContextSpec extends Specification {
 	}
 
 	@Unroll({"key generator is $keyGeneratorMatcher when controller is '$controllerName' and action is '$actionName'"})
-	def "a key generator bean name can be specified at controller or action level or is defaulted otherwise"() {
+	void "a key generator bean name can be specified at controller or action level or is defaulted otherwise"() {
 		given: "there is a request context"
 		request.controllerName >> controllerName
 		request.actionName >> actionName
@@ -219,7 +219,7 @@ class FilterContextSpec extends Specification {
 	}
 	
 	@Unroll({"cannot get key generator when controller is '$controllerName' and action is '$actionName'"})
-	def "cannot get key generator for a non-caching request"() {
+	void "cannot get key generator for a non-caching request"() {
 		given: "a request for a non-flushing action"
 		request.controllerName >> controllerName
 		request.actionName >> actionName

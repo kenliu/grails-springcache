@@ -27,7 +27,7 @@ class FlushingAspectSpec extends UnitSpec {
 	def aspect = new FlushingAspect()
 	def applicationContext = new StaticApplicationContext()
 
-	def setup() {
+	void setup() {
 		registerMetaClass ApplicationContext
 		ApplicationContext.metaClass.getProperty = { String name ->
 			delegate.getBean(name)
@@ -36,7 +36,7 @@ class FlushingAspectSpec extends UnitSpec {
 		applicationContext.registerSingleton "springcacheDefaultCacheResolver", DefaultCacheResolver
 	}
 
-	def "all specified caches are flushed"() {
+	void "all specified caches are flushed"() {
 		given:
 		aspect.springcacheService = Mock(SpringcacheService)
 		aspect.applicationContext = applicationContext
@@ -55,7 +55,7 @@ class FlushingAspectSpec extends UnitSpec {
 		1 * aspect.springcacheService.flush(["cache1", "cache2"])
 	}
 
-	def "can use 'caches' as an alias for 'value'"() {
+	void "can use 'caches' as an alias for 'value'"() {
 		given:
 		aspect.springcacheService = Mock(SpringcacheService)
 		aspect.applicationContext = applicationContext

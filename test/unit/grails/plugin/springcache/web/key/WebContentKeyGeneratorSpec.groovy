@@ -27,14 +27,14 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 
 	def generator = new WebContentKeyGenerator()
 
-	def setup() {
+	void setup() {
 		registerMetaClass HttpServletRequest
 		HttpServletRequest.metaClass.getFormat = {->
 			delegate.getAttribute(CONTENT_FORMAT)
 		}
 	}
 
-	def "by default xhr header is ignored"() {
+	void "by default xhr header is ignored"() {
 		given:
 		def ajaxRequest = new RequestBuilder().headers((X_REQUESTED_WITH): "XMLHttpRequest").toCacheParams()
 		def nonAjaxRequest = new RequestBuilder().toCacheParams()
@@ -47,7 +47,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 == key2
 	}
 
-	def "by default content type is ignored"() {
+	void "by default content type is ignored"() {
 		given:
 		def xmlRequest = new RequestBuilder().format("xml").toCacheParams()
 		def jsonRequest = new RequestBuilder().format("json").toCacheParams()
@@ -60,7 +60,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 == key2
 	}
 
-	def "by default request method is ignored"() {
+	void "by default request method is ignored"() {
 		given:
 		def getRequest = new RequestBuilder().method("GET").toCacheParams()
 		def postRequest = new RequestBuilder().method("POST").toCacheParams()
@@ -73,7 +73,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 == key2
 	}
 
-	def "keys can differ depending on whether request is ajax or not"() {
+	void "keys can differ depending on whether request is ajax or not"() {
 		given:
 		def ajaxRequest = new RequestBuilder().headers((X_REQUESTED_WITH): "XMLHttpRequest").toCacheParams()
 		def nonAjaxRequest = new RequestBuilder().toCacheParams()
@@ -91,7 +91,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 != key3
 	}
 
-	def "keys can differ depending on requested content type"() {
+	void "keys can differ depending on requested content type"() {
 		given:
 		def xmlRequest = new RequestBuilder().format("xml").toCacheParams()
 		def jsonRequest = new RequestBuilder().format("json").toCacheParams()
@@ -109,7 +109,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 != key3
 	}
 
-	def "'all' format is ignored"() {
+	void "'all' format is ignored"() {
 		given:
 		def request1 = new RequestBuilder().format("all").toCacheParams()
 		def request2 = new RequestBuilder().toCacheParams()
@@ -125,7 +125,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 == key2
 	}
 
-	def "keys can differ depending on request method"() {
+	void "keys can differ depending on request method"() {
 		given:
 		def getRequest = new RequestBuilder().method("GET").toCacheParams()
 		def postRequest = new RequestBuilder().method("POST").toCacheParams()
@@ -143,7 +143,7 @@ class WebContentKeyGeneratorSpec extends UnitSpec {
 		key1 != key3
 	}
 
-	def "get and head requests should generate the same key"() {
+	void "get and head requests should generate the same key"() {
 		given:
 		def getRequest = new RequestBuilder().method("GET").toCacheParams()
 		def headRequest = new RequestBuilder().method("HEAD").toCacheParams()

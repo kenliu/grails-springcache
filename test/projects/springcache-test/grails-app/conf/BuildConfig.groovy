@@ -26,15 +26,15 @@ grails.project.dependency.resolution = {
 	}
 	plugins {
 		compile ":bean-fields:0.5"
-		test ":build-test-data:1.1.1"
+		test ":build-test-data:1.1.2"
 		compile ":cache-headers:1.1.5"
 		test ":geb:$gebVersion"
 		compile ":hibernate:$grailsVersion"
-		compile ":rateable:0.6.2"
-		compile ":shiro:1.1.1"
+		compile ":rateable:0.7.1"
+		compile ":shiro:1.1.3"
 		test ":spock:0.6-SNAPSHOT"
 		build ":tomcat:$grailsVersion"
-		compile ":yui:2.7.0.1"
+		compile ":yui:2.8.2.1"
 		compile ":resources:1.1.6"
 		runtime ":jquery:1.7.1"
 	}
