@@ -35,7 +35,10 @@ class SpringcacheServiceSpec extends Specification {
 		manager.addCache "cache2"
 
 		cache1 = manager.getEhcache("cache1")
+		cache1.statisticsEnabled = true
+
 		cache2 = manager.getEhcache("cache2")
+		cache2.statisticsEnabled = true
 
 		service.springcacheCacheManager = manager
 	}
@@ -100,8 +103,6 @@ class SpringcacheServiceSpec extends Specification {
 			cache.put(new Element("key", "value"))
 			cache.get("key") // triggers a hit
 		}
-		println cache1.statistics
-		println cache2.statistics
 
 		when:
 		service.clearStatistics()
