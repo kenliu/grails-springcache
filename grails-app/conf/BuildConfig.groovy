@@ -16,7 +16,7 @@ grails.project.dependency.resolution = {
 		mavenCentral()
 	}
 	dependencies {
-		compile("net.sf.ehcache:ehcache-web:2.0.3") {
+		compile("net.sf.ehcache:ehcache-web:2.0.4") {
 			excludes "ehcache-core", "xml-apis" // ehcache-core is provided by Grails
 		}
 		test("org.objenesis:objenesis:1.2") {
