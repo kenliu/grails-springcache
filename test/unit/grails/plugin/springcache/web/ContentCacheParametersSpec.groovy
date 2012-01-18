@@ -15,31 +15,19 @@
  */
 package grails.plugin.springcache.web
 
-import grails.plugin.spock.UnitSpec
-import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import spock.lang.Unroll
-import org.codehaus.groovy.grails.commons.*
+import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.test.mixin.*
+import spock.lang.*
 
-class ContentCacheParametersSpec extends UnitSpec {
+@TestMixin(ControllerUnitTestMixin)
+@Mock(TestController)
+class ContentCacheParametersSpec extends Specification {
 
-	void setup() {
-		// set up the controllers as artefacts
-		def application = Mock(GrailsApplication)
-		[TestController].each { controllerClass ->
-			def name = GrailsNameUtils.getLogicalPropertyName(controllerClass.name, "Controller")
-			def artefact = new DefaultGrailsControllerClass(controllerClass)
-			application.getArtefactByLogicalPropertyName("Controller", name) >> artefact
-		}
-		ApplicationHolder.application = application
-	}
-
-	@Unroll({"controller is $expectedController and action is $expectedActionName when controllerName is '$controllerName' and actionName is '$actionName'"})
+	@Unroll({"controller is ${expectedController?.simpleName} and action is $expectedActionName when controllerName is '$controllerName' and actionName is '$actionName'"})
 	void "controller and action are identified based on the request context"() {
 		given:
-		def webRequest = Mock(GrailsWebRequest)
-		webRequest.controllerName >> controllerName
-		webRequest.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 
 		when:
 		def cacheParameters = new ContentCacheParameters(webRequest)
@@ -49,12 +37,13 @@ class ContentCacheParametersSpec extends UnitSpec {
 		cacheParameters.action?.name == expectedActionName
 
 		where:
-		controllerName | actionName | expectedController | expectedActionName
-		null           | null       | null               | null
-		"test"         | "index"    | TestController     | "index"
-		"test"         | "list"     | TestController     | "list"
-		"test"         | null       | TestController     | "index"
-		"test"         | "blah"     | TestController     | null
+		controllerName | actionName     | expectedController | expectedActionName
+		null           | null           | null               | null
+		"test"         | "index"        | TestController     | "index"
+		"test"         | "list"         | TestController     | "list"
+		"test"         | null           | TestController     | "index"
+		"test"         | "blah"         | TestController     | null
+		"test"         | "methodAction" | TestController     | 'methodAction' // http://jira.grails.org/browse/GPSPRINGCACHE-47
 	}
 }
 
@@ -62,5 +51,7 @@ class TestController {
 
 	def index = {}
 	def list = {}
+
+	def methodAction() {}
 
 }

@@ -15,24 +15,19 @@
  */
 package grails.plugin.springcache.web.key
 
-import grails.plugin.spock.UnitSpec
 import grails.plugin.springcache.web.ContentCacheParameters
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
 import grails.util.GrailsWebUtil
-import javax.servlet.http.HttpServletRequest
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import spock.lang.Specification
 import static grails.plugin.springcache.web.key.WebContentKeyGenerator.X_REQUESTED_WITH
 import static org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.CONTENT_FORMAT
 
-class WebContentKeyGeneratorSpec extends UnitSpec {
+@TestMixin(ControllerUnitTestMixin)
+class WebContentKeyGeneratorSpec extends Specification {
 
 	def generator = new WebContentKeyGenerator()
-
-	void setup() {
-		registerMetaClass HttpServletRequest
-		HttpServletRequest.metaClass.getFormat = {->
-			delegate.getAttribute(CONTENT_FORMAT)
-		}
-	}
 
 	void "by default xhr header is ignored"() {
 		given:
@@ -211,7 +206,7 @@ class RequestBuilder {
 	}
 
 	RequestBuilder format(String format) {
-		webRequest.currentRequest.setAttribute(CONTENT_FORMAT, format)
+		webRequest.currentRequest.format = format
 		this
 	}
 

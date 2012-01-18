@@ -15,48 +15,29 @@
  */
 package grails.plugin.springcache.web
 
-import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.support.MockApplicationContext
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.springframework.context.ApplicationContext
-import org.springframework.web.context.request.RequestContextHolder
+import grails.test.mixin.web.ControllerUnitTestMixin
 import grails.plugin.springcache.*
 import grails.plugin.springcache.annotations.*
 import grails.plugin.springcache.web.key.*
-import org.codehaus.groovy.grails.commons.*
+import grails.test.mixin.*
 import static org.hamcrest.CoreMatchers.instanceOf
 import spock.lang.*
 import static spock.util.matcher.HamcrestSupport.that
 
+@TestMixin(ControllerUnitTestMixin)
+@Mock([CachedTestController, UncachedTestController, RestfulTestController, FlushingTestController])
 class FilterContextSpec extends Specification {
-
-	GrailsWebRequest request = Mock()
-	MockApplicationContext appCtx = new MockApplicationContext()
 
 	void setup() {
 		// set up a spring context with a cacheResolver
-		ApplicationContext.metaClass.propertyMissing = { name -> delegate.getBean(name) }
-		appCtx.registerMockBean("springcacheDefaultCacheResolver", new DefaultCacheResolver())
-
-		// set up the controllers as artefacts
-		def application = Mock(GrailsApplication)
-		application.mainContext >> appCtx
-		[CachedTestController, UncachedTestController, RestfulTestController, FlushingTestController].each { controllerClass ->
-			def name = GrailsNameUtils.getLogicalPropertyName(controllerClass.name, "Controller")
-			def artefact = new DefaultGrailsControllerClass(controllerClass)
-			application.getArtefactByLogicalPropertyName("Controller", name) >> artefact
-		}
-		ApplicationHolder.application = application
-
-		// put the mock request in the evil static holder
-		RequestContextHolder.requestAttributes = request
+		grailsApplication.mainContext.registerMockBean("springcacheDefaultCacheResolver", new DefaultCacheResolver())
 	}
 
 	@Unroll({"shouldCache returns $shouldCache when controller is '$controllerName' and action is '$actionName'"})
 	void "a request is considered cachable if there is an annotation on the controller or action"() {
 		given: "there is a request context"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		expect:
@@ -77,8 +58,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"shouldFlush returns $shouldFlush when controller is '$controllerName' and action is '$actionName'"})
 	void "a request is considered flushable if there is an annotation on the controller or action"() {
 		given: "there is a request context"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		expect:
@@ -97,8 +78,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"cache name is '$expectedCacheName' when controller is '$controllerName' and action is '$actionName'"})
 	void "the cache name is identified based on the annotation on the controller or action"() {
 		given: "there is a request context"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		expect:
@@ -117,8 +98,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"cannot get cache name when controller is '$controllerName' and action is '$actionName'"})
 	void "cannot get cache name for a non-caching request"() {
 		given: "a request for a non-caching action"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		when:
@@ -140,8 +121,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"cache names are $expectedCacheNames when controller is '$controllerName' and action is '$actionName'"})
 	void "the cache names are identified based on the annotation on the controller or action"() {
 		given: "there is a request context"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		expect:
@@ -158,8 +139,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"cannot get cache names when controller is '$controllerName' and action is '$actionName'"})
 	void "cannot get cache names for a non-flushing request"() {
 		given: "a request for a non-flushing action"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		when:
@@ -181,12 +162,12 @@ class FilterContextSpec extends Specification {
 	void "the cache name is identified via the cache resolver specified by the annotation"() {
 		given: "a cache resolver bean"
 		def mockCacheResolver = Mock(CacheResolver)
-		appCtx.registerMockBean("mockCacheResolver", mockCacheResolver)
+		grailsApplication.mainContext.registerMockBean("mockCacheResolver", mockCacheResolver)
 		mockCacheResolver.resolveCacheName("listActionCache") >> { String name -> name.reverse() }
 
 		and: "a request context"
-		request.controllerName >> "cachedTest"
-		request.actionName >> "list4"
+		webRequest.controllerName = "cachedTest"
+		webRequest.actionName = "list4"
 		def context = new FilterContext()
 
 		expect:
@@ -196,13 +177,13 @@ class FilterContextSpec extends Specification {
 	@Unroll({"key generator is $keyGeneratorMatcher when controller is '$controllerName' and action is '$actionName'"})
 	void "a key generator bean name can be specified at controller or action level or is defaulted otherwise"() {
 		given: "there is a request context"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 		
 		and: "a key generator bean registered in the spring context"
-		appCtx.registerMockBean("springcacheDefaultKeyGenerator", new DefaultKeyGenerator())
-		appCtx.registerMockBean("alternateKeyGenerator", new WebContentKeyGenerator())
+		grailsApplication.mainContext.registerMockBean("springcacheDefaultKeyGenerator", new DefaultKeyGenerator())
+		grailsApplication.mainContext.registerMockBean("alternateKeyGenerator", new WebContentKeyGenerator())
 
 		expect:
 		that context.keyGenerator, keyGeneratorMatcher
@@ -221,8 +202,8 @@ class FilterContextSpec extends Specification {
 	@Unroll({"cannot get key generator when controller is '$controllerName' and action is '$actionName'"})
 	void "cannot get key generator for a non-caching request"() {
 		given: "a request for a non-flushing action"
-		request.controllerName >> controllerName
-		request.actionName >> actionName
+		webRequest.controllerName = controllerName
+		webRequest.actionName = actionName
 		def context = new FilterContext()
 
 		when:

@@ -15,16 +15,14 @@
  */
 package grails.plugin.springcache
 
-import grails.plugin.spock.UnitSpec
 import grails.spring.BeanBuilder
-import org.springframework.cache.ehcache.EhCacheFactoryBean
-import spock.lang.Unroll
-import net.sf.ehcache.*
-import net.sf.ehcache.constructs.blocking.*
 import grails.test.mixin.TestFor
-import spock.lang.Specification
-import static net.sf.ehcache.Status.STATUS_UNINITIALISED
 import net.sf.ehcache.config.CacheConfiguration
+import org.springframework.cache.ehcache.EhCacheFactoryBean
+import net.sf.ehcache.*
+import static net.sf.ehcache.Status.STATUS_UNINITIALISED
+import net.sf.ehcache.constructs.blocking.*
+import spock.lang.*
 
 @TestFor(SpringcacheService)
 class SpringcacheServiceSpec extends Specification {
