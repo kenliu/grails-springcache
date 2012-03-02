@@ -1,7 +1,6 @@
 package grails.plugin.springcache.web
 
 import auth.User
-import geb.spock.GebSpec
 import grails.plugin.springcache.SpringcacheService
 import musicstore.Album
 import musicstore.pages.HomePage
