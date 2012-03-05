@@ -40,6 +40,7 @@ class SpringcacheServiceSpec extends Specification {
 		cache2 = manager.getEhcache("cache2")
 		cache2.statisticsEnabled = true
 
+        service.grailsApplication = grailsApplication
 		service.springcacheCacheManager = manager
 	}
 

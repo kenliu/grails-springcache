@@ -16,18 +16,20 @@
 package grails.plugin.springcache
 
 import grails.spring.BeanBuilder
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware
 import org.slf4j.LoggerFactory
 import org.springframework.cache.ehcache.EhCacheFactoryBean
 import net.sf.ehcache.*
 import net.sf.ehcache.constructs.blocking.*
 import org.springframework.context.*
 
-class SpringcacheService implements ApplicationContextAware {
+class SpringcacheService implements ApplicationContextAware, GrailsApplicationAware {
 
 	static private final log = LoggerFactory.getLogger(SpringcacheService.class)
 	static transactional = false
 
+    GrailsApplication grailsApplication
 	ApplicationContext applicationContext
 	CacheManager springcacheCacheManager
 	boolean autoCreateCaches = true // TODO: config?
@@ -182,10 +184,8 @@ class SpringcacheService implements ApplicationContextAware {
 		}
 	}
 
-	static boolean isEnabled() {
-		ConfigurationHolder.with {
-			(config?.springcache?.enabled == null || config?.springcache?.enabled != false) && !config?.springcache?.disabled
-		}
+	boolean isEnabled() {
+        (grailsApplication.config?.springcache?.enabled == null || grailsApplication.config?.springcache?.enabled != false) && !grailsApplication.config?.springcache?.disabled
 	}
 }
 
