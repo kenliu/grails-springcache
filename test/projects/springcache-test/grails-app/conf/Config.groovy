@@ -86,6 +86,7 @@ log4j = {
 
 springcache {
 	defaults {
+//		statisticsEnabled = true
 		blocking = true
 		eternal = true
 		memoryStoreEvictionPolicy = "LFU"
