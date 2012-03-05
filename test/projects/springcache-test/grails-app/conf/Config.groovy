@@ -76,9 +76,11 @@ log4j = {
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
 
-	warn	'org.mortbay.log'
+	warn 'org.mortbay.log'
 
-	info	'net.sf.ehcache.constructs.web.filter'
+	info 'net.sf.ehcache.constructs.web.filter'
+
+	debug 'grails.plugin.springcache'
 
 }
 //log4j.logger.org.springframework.security='off,stdout'
@@ -90,6 +92,7 @@ springcache {
 		blocking = true
 		eternal = true
 		memoryStoreEvictionPolicy = "LFU"
+		timeToLive = 86400
 	}
 	caches {
 		albumControllerCache
@@ -101,6 +104,7 @@ springcache {
 		configuredCache {
 			timeToLive = 86400
 		}
+		eternalCache
 		resourcesControllerCache
 	}
 }

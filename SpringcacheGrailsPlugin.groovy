@@ -26,7 +26,7 @@ import org.springframework.cache.ehcache.*
 
 class SpringcacheGrailsPlugin {
 
-	def version = "1.3.2-SNAPSHOT"
+	def version = "1.4"
 	def grailsVersion = "1.2.0 > *"
 	def dependsOn = [:]
 	def pluginExcludes = [
@@ -144,6 +144,11 @@ class SpringcacheGrailsPlugin {
 			
 			decorator.decorate(tagLibClass, instance)
 		}
+	}
+
+	def getWebXmlFilterOrder() {
+		def FilterManager = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
+		[springcacheContentCache: FilterManager.URL_MAPPING_POSITION + 1000]
 	}
 
 	private static final log = LoggerFactory.getLogger("grails.plugin.springcache.SpringcacheGrailsPlugin")
