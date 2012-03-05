@@ -21,9 +21,9 @@ import spock.lang.*
 
 @TestMixin(ControllerUnitTestMixin)
 @Mock(TestController)
+@Unroll
 class ContentCacheParametersSpec extends Specification {
 
-	@Unroll
 	void "controller is #expectedController.simpleName and action is #expectedActionName when controllerName is '#controllerName' and actionName is '#actionName'"() {
 		given:
 		webRequest.controllerName = controllerName

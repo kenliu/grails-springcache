@@ -22,6 +22,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK
 import net.sf.ehcache.constructs.web.*
 import static org.codehaus.groovy.grails.web.servlet.HttpHeaders.*
 
+@Unroll
 class HeadersCategorySpec extends UnitSpec {
 
 	HttpDateFormatter formatter = new HttpDateFormatter()
@@ -31,7 +32,6 @@ class HeadersCategorySpec extends UnitSpec {
 		PageInfo.metaClass.mixin(HeadersCategory)
 	}
 
-	@Unroll
 	void "can use headers to identify newer content"() {
 		given:
 		def headers = []
@@ -54,7 +54,6 @@ class HeadersCategorySpec extends UnitSpec {
 		"Wed, 03 Nov 2010 21:11:22 GMT" | null                            | true
 	}
 
-	@Unroll
 	void "can use headers to identify matching content"() {
 		given:
 		def headers = []
@@ -77,7 +76,6 @@ class HeadersCategorySpec extends UnitSpec {
 		null | null        | false
 	}
 
-	@Unroll
 	void "can decode cache control directives"() {
 		given:
 		def headers = []

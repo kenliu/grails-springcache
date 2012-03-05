@@ -25,6 +25,7 @@ import net.sf.ehcache.constructs.blocking.*
 import spock.lang.*
 
 @TestFor(SpringcacheService)
+@Unroll
 class SpringcacheServiceSpec extends Specification {
 
 	CacheManager manager = new CacheManager()
@@ -44,8 +45,7 @@ class SpringcacheServiceSpec extends Specification {
 		service.springcacheCacheManager = manager
 	}
 
-	@Unroll
-	void "calling flush(#flushArgument) flushes the correct cache or caches"() {
+	void "calling flush with #flushArgument flushes the correct cache or caches"() {
 		given:
 		cache1.put(new Element("key", "value"))
 		cache2.put(new Element("key", "value"))
@@ -121,7 +121,6 @@ class SpringcacheServiceSpec extends Specification {
 		cache2.statistics.cacheMisses == 0L
 	}
 
-	@Unroll
 	void "doWithCache retrieves #value from cache"() {
 		given:
 		cache1.put(new Element("key", value))
@@ -308,7 +307,6 @@ class SpringcacheServiceSpec extends Specification {
 		blockingCache.get("key") == null
 	}
 
-	@Unroll
 	void "the #methodName method passes through when the plugin is disabled"() {
 		given:
 		grailsApplication.config.springcache.enabled = false
@@ -329,7 +327,6 @@ class SpringcacheServiceSpec extends Specification {
 		methodName << ["doWithCache", "doWithBlockingCache"]
 	}
 
-	@Unroll
 	void "the #methodName method is a no-op when the plugin is disabled"() {
 		given:
 		grailsApplication.config.springcache.enabled = false

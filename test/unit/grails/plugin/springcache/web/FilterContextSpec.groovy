@@ -26,6 +26,7 @@ import static spock.util.matcher.HamcrestSupport.that
 
 @TestMixin(ControllerUnitTestMixin)
 @Mock([CachedTestController, UncachedTestController, RestfulTestController, FlushingTestController])
+@Unroll
 class FilterContextSpec extends Specification {
 
 	void setup() {
@@ -33,7 +34,6 @@ class FilterContextSpec extends Specification {
 		grailsApplication.mainContext.registerMockBean("springcacheDefaultCacheResolver", new DefaultCacheResolver())
 	}
 
-	@Unroll
 	void "shouldCache returns #shouldCache when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
@@ -55,7 +55,6 @@ class FilterContextSpec extends Specification {
 	    "cachedTest"   | "blah"     | true
 	}
 
-	@Unroll
 	void "shouldFlush returns #shouldFlush when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
@@ -75,7 +74,6 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update2"  | true
 	}
 
-	@Unroll
 	void "cache name is '#expectedCacheName' when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
@@ -95,7 +93,6 @@ class FilterContextSpec extends Specification {
 	    "cachedTest"   | "blah"     | "testControllerCache"
 	}
 
-	@Unroll
 	void "cannot get cache name when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-caching action"
 		webRequest.controllerName = controllerName
@@ -118,7 +115,6 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update2"       
 	}
 
-	@Unroll
 	void "cache names are #expectedCacheNames when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
@@ -136,7 +132,6 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update3"  | ["testControllerCache", "listActionCache"]
 	}
 
-	@Unroll
 	void "cannot get cache names when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-flushing action"
 		webRequest.controllerName = controllerName
@@ -174,7 +169,6 @@ class FilterContextSpec extends Specification {
 		context.cacheName == "ehcaCnoitcAtsil"
 	}
 
-	@Unroll
 	void "key generator is #keyGeneratorMatcher when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
@@ -199,7 +193,6 @@ class FilterContextSpec extends Specification {
 		"restfulTest"  | "list"     | instanceOf(WebContentKeyGenerator)
 	}
 	
-	@Unroll
 	void "cannot get key generator when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-flushing action"
 		webRequest.controllerName = controllerName

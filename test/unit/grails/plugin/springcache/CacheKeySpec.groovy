@@ -17,12 +17,12 @@ package grails.plugin.springcache
 
 import spock.lang.*
 
+@Unroll
 class CacheKeySpec extends Specification {
 
 	static final TARGET_1 = new Object()
 	static final TARGET_2 = new Object()
 	
-	@Unroll
 	void "cache keys for #targetA.#methodA(#argsA) and #targetB.#methodB(#argsB) differ"() {
 		given:
 		def key1 = CacheKey.generate(targetA, methodA, argsA)
@@ -47,7 +47,6 @@ class CacheKeySpec extends Specification {
 		TARGET_1 | "x"     | [[1] as int[]]      | TARGET_1 | "x"     | [1]
 	}
 	
-	@Unroll
 	void "cache keys for multiple calls to the same method passing #args are equal"() {
 		given:
 		def key1 = CacheKey.generate(TARGET_1, "x", args)
