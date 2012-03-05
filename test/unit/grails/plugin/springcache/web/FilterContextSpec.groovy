@@ -33,8 +33,8 @@ class FilterContextSpec extends Specification {
 		grailsApplication.mainContext.registerMockBean("springcacheDefaultCacheResolver", new DefaultCacheResolver())
 	}
 
-	@Unroll({"shouldCache returns $shouldCache when controller is '$controllerName' and action is '$actionName'"})
-	void "a request is considered cachable if there is an annotation on the controller or action"() {
+	@Unroll
+	void "shouldCache returns #shouldCache when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -55,8 +55,8 @@ class FilterContextSpec extends Specification {
 	    "cachedTest"   | "blah"     | true
 	}
 
-	@Unroll({"shouldFlush returns $shouldFlush when controller is '$controllerName' and action is '$actionName'"})
-	void "a request is considered flushable if there is an annotation on the controller or action"() {
+	@Unroll
+	void "shouldFlush returns #shouldFlush when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -75,8 +75,8 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update2"  | true
 	}
 
-	@Unroll({"cache name is '$expectedCacheName' when controller is '$controllerName' and action is '$actionName'"})
-	void "the cache name is identified based on the annotation on the controller or action"() {
+	@Unroll
+	void "cache name is '#expectedCacheName' when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -95,8 +95,8 @@ class FilterContextSpec extends Specification {
 	    "cachedTest"   | "blah"     | "testControllerCache"
 	}
 
-	@Unroll({"cannot get cache name when controller is '$controllerName' and action is '$actionName'"})
-	void "cannot get cache name for a non-caching request"() {
+	@Unroll
+	void "cannot get cache name when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-caching action"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -118,8 +118,8 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update2"       
 	}
 
-	@Unroll({"cache names are $expectedCacheNames when controller is '$controllerName' and action is '$actionName'"})
-	void "the cache names are identified based on the annotation on the controller or action"() {
+	@Unroll
+	void "cache names are #expectedCacheNames when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -136,8 +136,8 @@ class FilterContextSpec extends Specification {
 		"flushingTest" | "update3"  | ["testControllerCache", "listActionCache"]
 	}
 
-	@Unroll({"cannot get cache names when controller is '$controllerName' and action is '$actionName'"})
-	void "cannot get cache names for a non-flushing request"() {
+	@Unroll
+	void "cannot get cache names when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-flushing action"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -174,8 +174,8 @@ class FilterContextSpec extends Specification {
 		context.cacheName == "ehcaCnoitcAtsil"
 	}
 
-	@Unroll({"key generator is $keyGeneratorMatcher when controller is '$controllerName' and action is '$actionName'"})
-	void "a key generator bean name can be specified at controller or action level or is defaulted otherwise"() {
+	@Unroll
+	void "key generator is #keyGeneratorMatcher when controller is '#controllerName' and action is '#actionName'"() {
 		given: "there is a request context"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName
@@ -199,8 +199,8 @@ class FilterContextSpec extends Specification {
 		"restfulTest"  | "list"     | instanceOf(WebContentKeyGenerator)
 	}
 	
-	@Unroll({"cannot get key generator when controller is '$controllerName' and action is '$actionName'"})
-	void "cannot get key generator for a non-caching request"() {
+	@Unroll
+	void "cannot get key generator when controller is '#controllerName' and action is '#actionName'"() {
 		given: "a request for a non-flushing action"
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName

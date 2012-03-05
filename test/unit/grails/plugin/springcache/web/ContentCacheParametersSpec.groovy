@@ -23,8 +23,8 @@ import spock.lang.*
 @Mock(TestController)
 class ContentCacheParametersSpec extends Specification {
 
-	@Unroll({"controller is ${expectedController?.simpleName} and action is $expectedActionName when controllerName is '$controllerName' and actionName is '$actionName'"})
-	void "controller and action are identified based on the request context"() {
+	@Unroll
+	void "controller is #expectedController.simpleName and action is #expectedActionName when controllerName is '#controllerName' and actionName is '#actionName'"() {
 		given:
 		webRequest.controllerName = controllerName
 		webRequest.actionName = actionName

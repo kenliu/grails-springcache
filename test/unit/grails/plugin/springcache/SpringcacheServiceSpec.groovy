@@ -44,8 +44,8 @@ class SpringcacheServiceSpec extends Specification {
 		service.springcacheCacheManager = manager
 	}
 
-	@Unroll({"calling flush($flushArgument) flushes the correct cache or caches"})
-	void "calling flush flushes the correct cache or caches"() {
+	@Unroll
+	void "calling flush(#flushArgument) flushes the correct cache or caches"() {
 		given:
 		cache1.put(new Element("key", "value"))
 		cache2.put(new Element("key", "value"))
@@ -121,8 +121,8 @@ class SpringcacheServiceSpec extends Specification {
 		cache2.statistics.cacheMisses == 0L
 	}
 
-	@Unroll({"doWithCache retrieves $value from cache"})
-	void "doWithCache retrieves value from cache"() {
+	@Unroll
+	void "doWithCache retrieves #value from cache"() {
 		given:
 		cache1.put(new Element("key", value))
 
@@ -308,8 +308,8 @@ class SpringcacheServiceSpec extends Specification {
 		blockingCache.get("key") == null
 	}
 
-	@Unroll({"the $methodName method passes through when the plugin is disabled"})
-	void "caching methods pass through when the plugin is disabled"() {
+	@Unroll
+	void "the #methodName method passes through when the plugin is disabled"() {
 		given:
 		grailsApplication.config.springcache.enabled = false
 		service.springcacheCacheManager = null
@@ -329,8 +329,8 @@ class SpringcacheServiceSpec extends Specification {
 		methodName << ["doWithCache", "doWithBlockingCache"]
 	}
 
-	@Unroll({"the $methodName method is a no-op when the plugin is disabled"})
-	void "flush and clear methods are no-ops when the plugin is disabled"() {
+	@Unroll
+	void "the #methodName method is a no-op when the plugin is disabled"() {
 		given:
 		grailsApplication.config.springcache.enabled = false
 		service.springcacheCacheManager = null
