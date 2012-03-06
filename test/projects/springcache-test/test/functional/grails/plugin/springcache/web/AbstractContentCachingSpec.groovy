@@ -8,6 +8,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.rateable.*
 import spock.lang.*
+import geb.spock.*
 
 abstract class AbstractContentCachingSpec extends GebSpec {
 

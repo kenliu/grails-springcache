@@ -7,23 +7,23 @@ import musicstore.pages.ProfileEditPage
 
 @Issue("http://jira.codehaus.org/browse/GRAILSPLUGINS-2167")
 @Stepwise
+@Unroll
 class ShardedCacheSpec extends AbstractContentCachingSpec {
 
-	def setupSpec() {
+	void setupSpec() {
 		setUpUser "blackbeard", "Edward Teach"
 		setUpUser "roundhouse", "Chuck Norris"
 	}
 
-	def cleanup() {
+	void cleanup() {
 		logout()
 	}
 
-	def cleanupSpec() {
+	void cleanupSpec() {
 		tearDownUsers()
 	}
 
-	@Unroll({"$username only sees their own profile"})
-	def "a user only sees their own profile"() {
+	void "#username only sees their own profile"() {
 		given: "a user is logged in"
 		to LoginPage
 		loginAs username
@@ -43,8 +43,7 @@ class ShardedCacheSpec extends AbstractContentCachingSpec {
 		"roundhouse" | "Profile: Chuck Norris"
 	}
 
-	@Unroll({"when re-visiting the profile page $username sees their own profile delivered from cache"})
-	def "when re-visiting the profile page a user sees their own profile delivered from cache"() {
+	void "when re-visiting the profile page #username sees their own profile delivered from cache"() {
 		given: "a user is logged in"
 		to LoginPage
 		loginAs username
@@ -64,7 +63,7 @@ class ShardedCacheSpec extends AbstractContentCachingSpec {
 		"roundhouse" | "Profile: Chuck Norris"
 	}
 
-	def "when a user updates their profile the cache is flushed"() {
+	void "when a user updates their profile the cache is flushed"() {
 		given: "a user is logged in"
 		to LoginPage
 		loginAs "blackbeard"

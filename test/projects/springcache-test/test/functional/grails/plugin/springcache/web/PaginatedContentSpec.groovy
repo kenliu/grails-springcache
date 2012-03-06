@@ -7,6 +7,7 @@ import net.sf.ehcache.Ehcache
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import musicstore.*
 import spock.lang.*
+import geb.spock.*
 
 @Stepwise
 class PaginatedContentSpec extends GebSpec {

@@ -11,6 +11,7 @@ import net.sf.ehcache.*
 import static org.codehaus.groovy.grails.web.servlet.HttpHeaders.*
 import spock.lang.*
 
+@Unroll
 @Issue("http://jira.codehaus.org/browse/GRAILSPLUGINS-2616")
 class CacheHeadersSpec extends Specification {
 
@@ -20,25 +21,25 @@ class CacheHeadersSpec extends Specification {
 	@Shared private Album album
 	private RESTClient http = new RESTClient()
 
-	def setupSpec() {
+	void setupSpec() {
 		album = Album.withNewSession {
 			Album.build(artist: new Artist(name: "Les Savy Fav"), name: "Root For Ruin", year: "2010")
 		}
 	}
 
-	def cleanupSpec() {
+	void cleanupSpec() {
 		Album.withNewSession {
 			Album.list()*.delete()
 			Artist.list()*.delete()
 		}
 	}
 
-	def cleanup() {
+	void cleanup() {
 		springcacheService.flushAll()
 		springcacheService.clearStatistics()
 	}
 
-	def "cache control headers from the original response are served with a cached response"() {
+	void "cache control headers from the original response are served with a cached response"() {
 		given: "the cache is primed by an previous request"
 		def response1 = http.get(uri: "http://localhost:8080/album/show/$album.id")
 
@@ -54,8 +55,7 @@ class CacheHeadersSpec extends Specification {
 		response1.headers[ETAG].value == response2.headers[ETAG].value
 	}
 
-	@Unroll({"a 304 is served rather than a cached response if the client sends $headers"})
-	def "a 304 is served rather than a cached response if the client has cached the response"() {
+	void "a 304 is served rather than a cached response if the client sends #headers"() {
 		given: "the cache is primed by an previous request"
 		http.get uri: "http://localhost:8080/album/show/$album.id"
 
@@ -76,8 +76,7 @@ class CacheHeadersSpec extends Specification {
 		"head" | [(IF_NONE_MATCH): "$album.id:$album.version"]
 	}
 
-	@Unroll({"the cached response is served if the client sends $headers"})
-	def "the cached response is served if the client's cached version does not match"() {
+	void "the cached response is served if the client sends #headers"() {
 		given: "the cache is primed by an previous request"
 		def response1 = http.get(uri: "http://localhost:8080/album/show/$album.id")
 
@@ -94,7 +93,7 @@ class CacheHeadersSpec extends Specification {
 		headers << [[(IF_MODIFIED_SINCE): "Tue, 15 Nov 1994 12:45:26 GMT"], [(IF_NONE_MATCH): "x:x"]]
 	}
 
-	def "a cached response's time-to-live is set according to the max-age header if there is one"() {
+	void "a cached response's time-to-live is set according to the max-age header if there is one"() {
 		when: "a response is cached"
 		http.get uri: "http://localhost:8080/album/show/$album.id"
 
@@ -105,7 +104,7 @@ class CacheHeadersSpec extends Specification {
 		cacheElement.timeToLive == HOURS.toSeconds(1)
 	}
 
-	def "a page is not cached if the response contains a no-cache directive in the cache-control header"() {
+	void "a page is not cached if the response contains a no-cache directive in the cache-control header"() {
 		when: "an action that sets cache:false is hit"
 		http.get uri: "http://localhost:8080/album/random"
 

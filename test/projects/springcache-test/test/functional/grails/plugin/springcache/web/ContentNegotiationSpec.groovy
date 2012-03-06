@@ -9,6 +9,7 @@ import musicstore.*
 import static org.codehaus.groovy.grails.web.servlet.HttpHeaders.ACCEPT
 import spock.lang.*
 
+@Unroll
 class ContentNegotiationSpec extends Specification {
 
 	@Shared SpringcacheService springcacheService = ApplicationHolder.application.mainContext.springcacheService
@@ -16,14 +17,14 @@ class ContentNegotiationSpec extends Specification {
 
 	private RESTClient http = new RESTClient()
 	
-	def setupSpec() {
+	void setupSpec() {
 		Album.withNewSession {
 			def artist = Artist.build(name: "The Cure")
 			Album.build(artist: artist, name: "Pornography", year: "1982")
 		}
 	}
 
-	def cleanupSpec() {
+	void cleanupSpec() {
 		Album.withNewSession {
 			Album.list()*.delete()
 			Artist.list()*.delete()
@@ -33,8 +34,7 @@ class ContentNegotiationSpec extends Specification {
 		springcacheService.clearStatistics()
 	}
 
-	@Unroll({"content requested with content type '$contentType' is cached separately"})
-	def "content requested with different formats is cached separately"() {
+	void "content requested with content type '#contentType' is cached separately"() {
 		when: "the latest album module is requested in a particular format"
 		def response = http.get(uri: "http://localhost:8080/latest/albums", headers : [(ACCEPT) : contentType])
 		

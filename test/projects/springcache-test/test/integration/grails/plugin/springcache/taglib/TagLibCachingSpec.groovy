@@ -20,6 +20,7 @@ import net.sf.ehcache.*
 import spock.lang.*
 
 @Stepwise
+@Unroll
 class TagLibCachingSpec extends GroovyPagesSpec {
 
 	def springcacheService
@@ -27,33 +28,32 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 	@Shared Ehcache tagLibCache
 	@Shared def springcacheCacheManager
 
-	def setupSpec() {
+	void setupSpec() {
 		tagLibCache = new Cache("tagLibCache", 100, false, true, 0, 0)
 	}
 
-	def setup() {
+	void setup() {
 		// have to do this in setup as injection doesn't happen until after setupSpec
 		if (!springcacheCacheManager.cacheExists(tagLibCache.name)) {
 			springcacheCacheManager.addCache(tagLibCache)
 		}
 	}
 
-	def cleanupSpec() {
+	void cleanupSpec() {
 		springcacheCacheManager.removeCache("tagLibCache")
 	}
 
-	def "cacheable tags should be an instance of cachingtag"() {
+	void "cacheable tags should be an instance of cachingtag"() {
 		expect:
 		testCachingTagLib.caching instanceof CachingTag
 	}
 
-	def "noncacheable tags should not be an instance of cachingtag"() {
+	void "noncacheable tags should not be an instance of cachingtag"() {
 		expect:
 		!(testCachingTagLib.noncaching instanceof CachingTag)
 	}
 
-	@Unroll
-	def "invoking a cacheable tag should prime the cache"() {
+	void "invoking a cacheable tag should prime the cache"() {
 		given:
 		testCachingTagLib.value = "INITIAL"
 
@@ -73,8 +73,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		"<testcaching:withBody>INITIAL</testcaching:withBody>" | "INITIAL"
 	}
 
-	@Unroll
-	def "invoking the same tag again should hit the cache"() {
+	void "invoking the same tag again should hit the cache"() {
 		given:
 		testCachingTagLib.value = "UPDATED"
 
@@ -93,8 +92,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		"<testcaching:withBody>UPDATED</testcaching:withBody>" | "INITIAL"
 	}
 
-	@Unroll
-	def "tag attributes affect the cache key"() {
+	void "tag attributes affect the cache key"() {
 		given:
 		testCachingTagLib.value = "INITIAL"
 
@@ -114,8 +112,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		'<testcaching:withBody a="${a}" b="${b}">INITIAL</testcaching:withBody>' | "INITIAL"
 	}
 
-	@Unroll
-	def "using the same tag attributes again hits the cache"() {
+	void "using the same tag attributes again hits the cache"() {
 		given:
 		testCachingTagLib.value = "UPDATED"
 
@@ -135,8 +132,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		'<testcaching:withBody a="${a}" b="${b}">INITIAL</testcaching:withBody>' | "INITIAL"
 	}
 
-	@Unroll
-	def "using the same tag attributes in a different order hits the cache"() {
+	void "using the same tag attributes in a different order hits the cache"() {
 		when:
 		template = tagTemplate
 		params = [a: "a", b: "b"]
@@ -153,8 +149,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		'<testcaching:withBody b="${b}" a="${a}">INITIAL</testcaching:withBody>' | "INITIAL"
 	}
 
-	@Unroll
-	def "using different tag attributes misses the cache"() {
+	void "using different tag attributes misses the cache"() {
 		when:
 		template = tagTemplate
 		params = [a: "x", b: "y"]
@@ -171,7 +166,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		'<testcaching:withBody b="${b}" a="${a}">UPDATED</testcaching:withBody>' | "UPDATED"
 	}
 
-	def "another tag invoking the cached tag internally will hit the cache"() {
+	void "another tag invoking the cached tag internally will hit the cache"() {
 		when:
 		template = '<testcaching:indirect/>'
 
@@ -182,7 +177,7 @@ class TagLibCachingSpec extends GroovyPagesSpec {
 		cacheHits == old(cacheHits) + 1
 	}
 
-	def "another tag invoking the cached tag internally with parameters will hit the cache"() {
+	void "another tag invoking the cached tag internally with parameters will hit the cache"() {
 		when:
 		template = '<testcaching:indirect a="${a}" b="${b}" />'
 		params = [a: "a", b: "b"]
