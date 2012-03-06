@@ -29,7 +29,7 @@ grails.project.dependency.resolution = {
 		test(":hibernate:$grailsVersion") {
 			export = false
 		}
-		test(":spock:0.6-rc-1") {
+		test(":spock:0.6") {
 			export = false
 		}
 	}
