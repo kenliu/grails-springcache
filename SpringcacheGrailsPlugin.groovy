@@ -137,15 +137,15 @@ class SpringcacheGrailsPlugin {
 	}
 
 	def onChange = { event ->
-		if (application.isTagLibClass(event.source)) {
-			def tagLibClass = application.getTagLibClass(event.source.name)
-			def instance = event.ctx."${event.source.name}"
-			def decorator = new CachingTagLibDecorator(event.ctx.springcacheService)
-			
-			decorator.decorate(tagLibClass, instance)
-		}
+	   if (application.isTagLibClass(event.source)) {
+	      for (tagLibClass in application.tagLibClasses) {
+	         if (tagLibClass.fullName == event.source.name) {
+	            new CachingTagLibDecorator(event.ctx.springcacheService).decorate(tagLibClass, event.ctx."$event.source.name")
+	            return
+	         }
+	      }
+	   }
 	}
-
 	def getWebXmlFilterOrder() {
 		def FilterManager = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
 		[springcacheContentCache: FilterManager.URL_MAPPING_POSITION + 1000]
